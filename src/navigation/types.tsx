@@ -17,7 +17,7 @@ export type LinkStackParamList = {
     LinkDetail: undefined;
 };
 
-export type HomeStackScreenProps<T extends keyof LinkStackParamList> =
+export type LinkStackScreenProps<T extends keyof LinkStackParamList> =
     CompositeScreenProps<
         NativeStackScreenProps<LinkStackParamList, T>,
         RootStackScreenProps<keyof RootStackParamList>
