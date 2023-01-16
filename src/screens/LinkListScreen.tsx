@@ -8,19 +8,23 @@ import { Header } from "../components/Header/Header";
 import { Icon } from "../components/Icons";
 import { Spacer } from "../components/Spacer";
 import { Typography } from "../components/Typography";
-import { atomLinkList } from "../states/atomLinkList";
+import { atomLinkList, Link } from "../states/atomLinkList";
 
 export const LinkListScreen = () => {
     const navigation = useNavigation();
     const safeAreaInset = useSafeAreaInsets();
     const data = useRecoilValue(atomLinkList);
 
-    const onPressButton = useCallback(() => {
-        navigation.navigate("LinkStack", { screen: "LinkDetail" });
-    }, []);
     const onPressAddButton = useCallback(() => {
         navigation.navigate("AddLink");
     }, []);
+    const onPressListItem = useCallback((item: Link) => {
+        navigation.navigate("LinkStack", {
+            screen: "LinkDetail",
+            params: { item },
+        });
+    }, []);
+
     return (
         <View style={{ flex: 1 }}>
             <Header>
@@ -32,16 +36,21 @@ export const LinkListScreen = () => {
                 style={{ flex: 1 }}
                 data={data.list}
                 renderItem={({ item }) => (
-                    <View>
-                        <Typography fontSize={20}>{item.link}</Typography>
-                        <Spacer size={4} />
-                        <Typography color="gray">
-                            {item.title !== ""
-                                ? `${item.title.slice(0, 20)} | `
-                                : ""}
-                            {new Date(item.createdAt).toLocaleString()}{" "}
-                        </Typography>
-                    </View>
+                    <Button
+                        onPress={() => onPressListItem(item)}
+                        style={{ paddingHorizontal: 24, paddingVertical: 12 }}
+                    >
+                        <View>
+                            <Typography fontSize={20}>{item.link}</Typography>
+                            <Spacer size={4} />
+                            <Typography color="gray">
+                                {item.title !== ""
+                                    ? `${item.title.slice(0, 20)} | `
+                                    : ""}
+                                {new Date(item.createdAt).toLocaleString()}{" "}
+                            </Typography>
+                        </View>
+                    </Button>
                 )}
             />
             <View
