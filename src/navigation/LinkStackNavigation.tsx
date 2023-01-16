@@ -6,7 +6,13 @@ const Stack = createNativeStackNavigator();
 
 export const LinkStackNavigation = () => {
     return (
-        <Stack.Navigator>
+        <Stack.Navigator
+            initialRouteName="LinkList"
+            screenOptions={{
+                presentation: "card",
+                headerShown: false,
+            }}
+        >
             <Stack.Screen name="LinkList" component={LinkListScreen} />
             <Stack.Screen name="LinkDetail" component={LinkDetailScreen} />
         </Stack.Navigator>
