@@ -3,6 +3,7 @@ import type {
     NavigatorScreenParams,
 } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { Link } from "../states/atomLinkList";
 
 export type RootStackParamList = {
     LinkStack: NavigatorScreenParams<LinkStackParamList>;
@@ -14,7 +15,7 @@ export type RootStackScreenProps<T extends keyof RootStackParamList> =
 
 export type LinkStackParamList = {
     LinkList: undefined;
-    LinkDetail: undefined;
+    LinkDetail: { item: Link };
 };
 
 export type LinkStackScreenProps<T extends keyof LinkStackParamList> =
