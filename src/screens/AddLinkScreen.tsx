@@ -2,20 +2,45 @@ import { useNavigation } from "@react-navigation/native";
 import { useCallback, useState } from "react";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useRecoilState } from "recoil";
 import { Button } from "../components/Button";
 import { Header } from "../components/Header/Header";
 import { SingleLineInput } from "../components/SingleLineInput";
 import { Spacer } from "../components/Spacer";
 import { Typography } from "../components/Typography";
+import { atomLinkList, Link } from "../states/atomLinkList";
 
 export const AddLinkScreen = () => {
     const navigation = useNavigation();
     const insets = useSafeAreaInsets();
+    const [_, updateList] = useRecoilState(atomLinkList);
     const [url, setUrl] = useState("");
 
     const onPressBack = useCallback(() => {
         navigation.goBack();
     }, []);
+
+    const onPressSave = useCallback(() => {
+        if (url === "") {
+            return;
+        }
+        updateList((prevState) => {
+            const list = [
+                {
+                    title: "",
+                    image: "",
+                    link: url,
+                    createdAt: new Date().toISOString(),
+                },
+            ] as Link[];
+
+            return {
+                list: list.concat(prevState.list),
+            };
+        });
+
+        setUrl("");
+    }, [url]);
     return (
         <View style={{ flex: 1 }}>
             <Header>
@@ -39,7 +64,7 @@ export const AddLinkScreen = () => {
                     keyboardType="url"
                 />
             </View>
-            <Button onPress={function (): void {}}>
+            <Button onPress={onPressSave}>
                 <View
                     style={{ backgroundColor: url === "" ? "gray" : "black" }}
                 >
