@@ -1,16 +1,20 @@
 import { useNavigation } from "@react-navigation/native";
 import { useCallback } from "react";
-import { View } from "react-native";
+import { FlatList, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useRecoilValue } from "recoil";
 import { Button } from "../components/Button";
 import { Header } from "../components/Header/Header";
 import { Icon } from "../components/Icons";
 import { Spacer } from "../components/Spacer";
 import { Typography } from "../components/Typography";
+import { atomLinkList } from "../states/atomLinkList";
 
 export const LinkListScreen = () => {
     const navigation = useNavigation();
     const safeAreaInset = useSafeAreaInsets();
+    const data = useRecoilValue(atomLinkList);
+
     const onPressButton = useCallback(() => {
         navigation.navigate("LinkStack", { screen: "LinkDetail" });
     }, []);
@@ -24,15 +28,22 @@ export const LinkListScreen = () => {
                     <Header.Title title="Links" />
                 </Header.Group>
             </Header>
-            <View>
-                <Button onPress={onPressButton}>
-                    <Typography fontSize={16}>Go to link detail</Typography>
-                </Button>
-                <Spacer size={12} />
-                <Button onPress={onPressAddButton}>
-                    <Typography fontSize={16}>Go to add link</Typography>
-                </Button>
-            </View>
+            <FlatList
+                style={{ flex: 1 }}
+                data={data.list}
+                renderItem={({ item }) => (
+                    <View>
+                        <Typography fontSize={20}>{item.link}</Typography>
+                        <Spacer size={4} />
+                        <Typography color="gray">
+                            {item.title !== ""
+                                ? `${item.title.slice(0, 20)} | `
+                                : ""}
+                            {new Date(item.createdAt).toLocaleString()}{" "}
+                        </Typography>
+                    </View>
+                )}
+            />
             <View
                 style={{
                     position: "absolute",
