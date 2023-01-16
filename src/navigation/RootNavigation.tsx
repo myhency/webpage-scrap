@@ -6,7 +6,13 @@ const Stack = createNativeStackNavigator();
 
 export const RootNavigation = () => {
     return (
-        <Stack.Navigator>
+        <Stack.Navigator
+            initialRouteName="LinkStack"
+            screenOptions={{
+                presentation: "containedModal",
+                headerShown: false,
+            }}
+        >
             <Stack.Screen name="LinkStack" component={LinkStackNavigation} />
             <Stack.Screen name="AddLink" component={AddLinkScreen} />
         </Stack.Navigator>
