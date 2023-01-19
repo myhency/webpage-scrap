@@ -14,6 +14,7 @@ interface Props {
     fontSize?: number;
     keyboardType?: KeyboardTypeOptions;
     onChangeText: (text: string) => void;
+    onSubmitEditing: () => void;
 }
 
 export const SingleLineInput = ({
@@ -23,6 +24,7 @@ export const SingleLineInput = ({
     fontSize,
     keyboardType,
     onChangeText,
+    onSubmitEditing,
 }: Props) => {
     const [focused, setFocused] = useState(false);
 
@@ -46,6 +48,7 @@ export const SingleLineInput = ({
                 style={[style, { fontSize: fontSize ?? 20 }]}
                 onFocus={() => setFocused(true)}
                 onBlur={() => setFocused(false)}
+                onSubmitEditing={onSubmitEditing}
             />
         </View>
     );
