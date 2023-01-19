@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRecoilState } from "recoil";
@@ -10,6 +10,7 @@ import { SingleLineInput } from "../components/SingleLineInput";
 import { Spacer } from "../components/Spacer";
 import { Typography } from "../components/Typography";
 import { atomLinkList, Link } from "../states/atomLinkList";
+import { getClipboardString } from "../utils/clipboard-utils";
 import { getOpenGraphData } from "../utils/open-graph-tag-utils";
 
 export const AddLinkScreen = () => {
@@ -31,8 +32,8 @@ export const AddLinkScreen = () => {
         updateList((prevState) => {
             const list = [
                 {
-                    title: "",
-                    image: "",
+                    title: (metaData as any).title || "",
+                    image: (metaData as any).image || "",
                     link: url,
                     createdAt: new Date().toISOString(),
                 },
@@ -44,7 +45,25 @@ export const AddLinkScreen = () => {
         });
 
         setUrl("");
+        setMetaData(null);
     }, [url]);
+
+    const onGetClipboardString = useCallback(async () => {
+        const clipboardString = await getClipboardString();
+        if (
+            clipboardString.startsWith("http://") ||
+            clipboardString.startsWith("https://")
+        ) {
+            setUrl(clipboardString);
+            const result = await getOpenGraphData(clipboardString);
+            setMetaData(result);
+        }
+    }, []);
+
+    useEffect(() => {
+        //https://gather.town
+        onGetClipboardString();
+    }, [url, metaData]);
 
     const onSubmitEditing = useCallback(async () => {
         const result = await getOpenGraphData(url);
