@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
-import { useCallback } from "react";
-import { FlatList, View } from "react-native";
+import { useCallback, useMemo } from "react";
+import { FlatList, SectionList, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRecoilValue } from "recoil";
 import { Button } from "../components/Button";
@@ -25,6 +25,33 @@ export const LinkListScreen = () => {
         });
     }, []);
 
+    const sectionData = useMemo(() => {
+        const dataList: { [key: string]: any[] } = {};
+
+        const makeDateString = (createdAt: string) => {
+            const dateItem = new Date(createdAt);
+            return `${dateItem.getFullYear()}-${
+                dateItem.getMonth() + 1
+            }-${dateItem.getDate()}`;
+        };
+
+        if (!data.list) return [];
+        data.list.forEach((item) => {
+            const dateString = makeDateString(item.createdAt);
+            if (!dataList[dateString]) {
+                dataList[dateString] = [item];
+            } else {
+                dataList[dateString].push(item);
+            }
+        });
+        return Object.keys(dataList).map((key) => {
+            return {
+                title: key,
+                data: dataList[key],
+            };
+        });
+    }, [data]);
+
     return (
         <View style={{ flex: 1 }}>
             <Header>
@@ -32,9 +59,9 @@ export const LinkListScreen = () => {
                     <Header.Title title="Links" />
                 </Header.Group>
             </Header>
-            <FlatList
+            <SectionList
                 style={{ flex: 1 }}
-                data={data.list}
+                sections={sectionData}
                 renderItem={({ item }) => (
                     <Button
                         onPress={() => onPressListItem(item)}
@@ -51,6 +78,19 @@ export const LinkListScreen = () => {
                             </Typography>
                         </View>
                     </Button>
+                )}
+                renderSectionHeader={({ section: { title } }) => (
+                    <View
+                        style={{
+                            paddingHorizontal: 12,
+                            paddingVertical: 4,
+                            backgroundColor: "white",
+                        }}
+                    >
+                        <Typography fontSize={20} color={"gray"}>
+                            {title}
+                        </Typography>
+                    </View>
                 )}
             />
             <View
