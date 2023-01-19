@@ -1,10 +1,11 @@
 import { useNavigation } from "@react-navigation/native";
 import { useCallback, useEffect, useState } from "react";
-import { useWindowDimensions, View } from "react-native";
+import { ActivityIndicator, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRecoilState } from "recoil";
 import { Button } from "../components/Button";
 import { Header } from "../components/Header/Header";
+import { Icon } from "../components/Icons";
 import { RemoteImage } from "../components/RemoteImage";
 import { SingleLineInput } from "../components/SingleLineInput";
 import { Spacer } from "../components/Spacer";
@@ -19,6 +20,7 @@ export const AddLinkScreen = () => {
     const [_, updateList] = useRecoilState(atomLinkList);
     const [url, setUrl] = useState("");
     const [metaData, setMetaData] = useState(null);
+    const [loading, setLoading] = useState(false);
     const { width } = useWindowDimensions();
 
     const onPressBack = useCallback(() => {
@@ -66,8 +68,10 @@ export const AddLinkScreen = () => {
     }, [url, metaData]);
 
     const onSubmitEditing = useCallback(async () => {
+        setLoading(true);
         const result = await getOpenGraphData(url);
         setMetaData(result);
+        setLoading(false);
     }, [url]);
 
     return (
@@ -82,19 +86,39 @@ export const AddLinkScreen = () => {
                 style={{
                     flex: 1,
                     justifyContent: "flex-start",
-                    alignItems: "center",
                     paddingTop: 32,
                     paddingHorizontal: 24,
                 }}
             >
-                <SingleLineInput
-                    value={url}
-                    onChangeText={setUrl}
-                    placeholder="https://example.com"
-                    keyboardType="url"
-                    onSubmitEditing={onSubmitEditing}
-                />
-                {metaData && (
+                <View>
+                    <SingleLineInput
+                        value={url}
+                        onChangeText={setUrl}
+                        placeholder="https://example.com"
+                        keyboardType="url"
+                        onSubmitEditing={onSubmitEditing}
+                    />
+                    <View
+                        style={{
+                            position: "absolute",
+                            top: 0,
+                            bottom: 0,
+                            right: 0,
+                            justifyContent: "center",
+                            alignItems: "center",
+                        }}
+                    >
+                        <Button
+                            onPress={() => {
+                                setUrl("");
+                                setMetaData(null);
+                            }}
+                        >
+                            <Icon name="close" size={24} color={"black"} />
+                        </Button>
+                    </View>
+                </View>
+                {loading ? (
                     <>
                         <Spacer size={20} />
                         <View
@@ -104,28 +128,58 @@ export const AddLinkScreen = () => {
                                 borderColor: "gray",
                             }}
                         >
-                            <RemoteImage
-                                url={(metaData as any).image}
-                                width={width - 48}
-                                height={(width - 48) * 0.5}
-                            />
+                            <Spacer size={(width - 48) * 0.5} />
+                            <Spacer size={50} />
+
                             <View
                                 style={{
-                                    paddingHorizontal: 12,
-                                    paddingVertical: 8,
+                                    position: "absolute",
+                                    left: 0,
+                                    right: 0,
+                                    top: 0,
+                                    bottom: 0,
+                                    alignItems: "center",
+                                    justifyContent: "center",
                                 }}
                             >
-                                <Spacer size={10} />
-                                <Typography fontSize={20} color="black">
-                                    {(metaData as any).title}
-                                </Typography>
-                                <Spacer size={4} />
-                                <Typography fontSize={16} color="gray">
-                                    {(metaData as any).description}
-                                </Typography>
+                                <ActivityIndicator />
                             </View>
                         </View>
                     </>
+                ) : (
+                    metaData && (
+                        <>
+                            <Spacer size={20} />
+                            <View
+                                style={{
+                                    borderWidth: 1,
+                                    borderRadius: 4,
+                                    borderColor: "gray",
+                                }}
+                            >
+                                <RemoteImage
+                                    url={(metaData as any).image}
+                                    width={width - 48}
+                                    height={(width - 48) * 0.5}
+                                />
+                                <View
+                                    style={{
+                                        paddingHorizontal: 12,
+                                        paddingVertical: 8,
+                                    }}
+                                >
+                                    <Spacer size={10} />
+                                    <Typography fontSize={20} color="black">
+                                        {(metaData as any).title}
+                                    </Typography>
+                                    <Spacer size={4} />
+                                    <Typography fontSize={16} color="gray">
+                                        {(metaData as any).description}
+                                    </Typography>
+                                </View>
+                            </View>
+                        </>
+                    )
                 )}
             </View>
             <Button onPress={onPressSave}>
